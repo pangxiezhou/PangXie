@@ -24,10 +24,10 @@ DASMFLAGS	= -u -o $(ENTRYPOINT) -e $(ENTRYOFFSET)
 # This Program
 ORANGESBOOT	= boot/boot.bin boot/loader.bin
 ORANGESKERNEL	= kernel.bin
-OBJS		= kernel/kernel.o kernel/syscall.o kernel/start.o kernel/main.o\
-			kernel/clock.o kernel/keyboard.o kernel/tty.o kernel/console.o\
-			kernel/i8259.o kernel/global.o kernel/protect.o kernel/proc.o\
-			kernel/printf.o kernel/vsprintf.o\
+OBJS		= kernel/init/kernel.o kernel/syscall/syscall.o kernel/init/start.o kernel/init/main.o\
+			kernel/proc/clock.o kernel/tty/keyboard.o kernel/tty/tty.o kernel/tty/console.o\
+			kernel/init/i8259.o kernel/global.o kernel/init/protect.o kernel/proc/proc.o\
+			kernel/tty/printf.o kernel/tty/vsprintf.o\
 			lib/kliba.o lib/klib.o lib/string.o
 DASMOUTPUT	= kernel.bin.asm
 
@@ -70,50 +70,50 @@ boot/loader.bin : boot/loader.asm boot/include/load.inc boot/include/fat12hdr.in
 $(ORANGESKERNEL) : $(OBJS)
 	$(LD) $(LDFLAGS) -o $(ORANGESKERNEL) $(OBJS)
 
-kernel/kernel.o : kernel/kernel.asm include/sconst.inc
+kernel/init/kernel.o : kernel/init/kernel.asm include/sconst.inc
 	$(ASM) $(ASMKFLAGS) -o $@ $<
 
-kernel/syscall.o : kernel/syscall.asm include/sconst.inc
+kernel/syscall/syscall.o : kernel/syscall/syscall.asm include/sconst.inc
 	$(ASM) $(ASMKFLAGS) -o $@ $<
 
-kernel/start.o: kernel/start.c include/type.h include/const.h include/protect.h include/string.h include/proc.h include/proto.h \
+kernel/init/start.o: kernel/init/start.c include/type.h include/const.h include/protect.h include/string.h include/proc.h include/proto.h \
 			include/global.h
 	$(CC) $(CFLAGS) -o $@ $<
 
-kernel/main.o: kernel/main.c include/type.h include/const.h include/protect.h include/string.h include/proc.h include/proto.h \
+kernel/init/main.o: kernel/init/main.c include/type.h include/const.h include/protect.h include/string.h include/proc.h include/proto.h \
 			include/global.h
 	$(CC) $(CFLAGS) -o $@ $<
 
-kernel/clock.o: kernel/clock.c
+kernel/proc/clock.o: kernel/proc/clock.c
 	$(CC) $(CFLAGS) -o $@ $<
 
-kernel/keyboard.o: kernel/keyboard.c
+kernel/tty/keyboard.o: kernel/tty/keyboard.c
 	$(CC) $(CFLAGS) -o $@ $<
 
-kernel/tty.o: kernel/tty.c
+kernel/tty/tty.o: kernel/tty/tty.c
 	$(CC) $(CFLAGS) -o $@ $<
 
 kernel/console.o: kernel/console.c
 	$(CC) $(CFLAGS) -o $@ $<
 
-kernel/i8259.o: kernel/i8259.c include/type.h include/const.h include/protect.h include/proto.h
+kernel/init/i8259.o: kernel/init/i8259.c include/type.h include/const.h include/protect.h include/proto.h
 	$(CC) $(CFLAGS) -o $@ $<
 
 kernel/global.o: kernel/global.c include/type.h include/const.h include/protect.h include/proc.h \
 			include/global.h include/proto.h
 	$(CC) $(CFLAGS) -o $@ $<
 
-kernel/protect.o: kernel/protect.c include/type.h include/const.h include/protect.h include/proc.h include/proto.h \
+kernel/init/protect.o: kernel/init/protect.c include/type.h include/const.h include/protect.h include/proc.h include/proto.h \
 			include/global.h
 	$(CC) $(CFLAGS) -o $@ $<
 
-kernel/proc.o: kernel/proc.c
+kernel/proc/proc.o: kernel/proc/proc.c
 	$(CC) $(CFLAGS) -o $@ $<
 
-kernel/printf.o: kernel/printf.c
+kernel/tty/printf.o: kernel/tty/printf.c
 	$(CC) $(CFLAGS) -o $@ $<
 
-kernel/vsprintf.o: kernel/vsprintf.c
+kernel/tty/vsprintf.o: kernel/tty/vsprintf.c
 	$(CC) $(CFLAGS) -o $@ $<
 
 lib/klib.o: lib/klib.c include/type.h include/const.h include/protect.h include/string.h include/proc.h include/proto.h \
