@@ -16,6 +16,8 @@
 #define	PUBLIC		/* PUBLIC is the opposite of PRIVATE */
 #define	PRIVATE	static	/* PRIVATE x limits the scope of x */
 
+#define	max(a,b)	((a) > (b) ? (a) : (b))
+#define	min(a,b)	((a) < (b) ? (a) : (b))
 /* Color */
 /*
  * e.g. MAKE_COLOR(BLUE, RED)

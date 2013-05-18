@@ -24,5 +24,5 @@ typedef struct s_tty
 	struct s_console *	p_console;
 }TTY;
 
-
+PUBLIC void init_tty();
 #endif /* _ORANGES_TTY_H_ */

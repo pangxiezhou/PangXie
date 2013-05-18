@@ -47,7 +47,7 @@ PUBLIC void scroll_screen(CONSOLE* p_con, int direction);
 
 /* printf.c */
 PUBLIC  int     printf(const char *fmt, ...);
-
+PUBLIC int 	   printl(const char *fmt, ...);
 /* vsprintf.c */
 PUBLIC  int     vsprintf(char *buf, const char *fmt, va_list args);
 

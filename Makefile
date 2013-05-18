@@ -28,7 +28,7 @@ OBJS		= kernel/init/kernel.o kernel/syscall/syscall.o kernel/init/start.o kernel
 			kernel/proc/clock.o kernel/tty/keyboard.o kernel/tty/tty.o kernel/tty/console.o\
 			kernel/init/i8259.o kernel/global.o kernel/init/protect.o kernel/proc/proc.o\
 			kernel/tty/printf.o kernel/tty/vsprintf.o\
-			lib/kliba.o lib/klib.o lib/string.o
+			lib/kliba.o lib/klib.o lib/string.o driver/hd.o
 DASMOUTPUT	= kernel.bin.asm
 
 # All Phony Targets
@@ -115,7 +115,8 @@ kernel/tty/printf.o: kernel/tty/printf.c
 
 kernel/tty/vsprintf.o: kernel/tty/vsprintf.c
 	$(CC) $(CFLAGS) -o $@ $<
-
+driver/hd.o:driver/hd.c
+	$(CC) $(CFLAGS) -o $@ $<
 lib/klib.o: lib/klib.c include/type.h include/const.h include/protect.h include/string.h include/proc.h include/proto.h \
 			include/global.h
 	$(CC) $(CFLAGS) -o $@ $<

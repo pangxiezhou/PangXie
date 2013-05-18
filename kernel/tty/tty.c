@@ -19,7 +19,7 @@
 #define TTY_FIRST	(tty_table)
 #define TTY_END		(tty_table + NR_CONSOLES)
 
-PRIVATE void init_tty(TTY* p_tty);
+PRIVATE void tty_init(TTY* p_tty);
 PRIVATE void tty_do_read(TTY* p_tty);
 PRIVATE void tty_do_write(TTY* p_tty);
 PRIVATE void put_key(TTY* p_tty, u32 key);
@@ -30,13 +30,6 @@ PRIVATE void put_key(TTY* p_tty, u32 key);
 PUBLIC void task_tty()
 {
 	TTY*	p_tty;
-
-	init_keyboard();
-
-	for (p_tty=TTY_FIRST;p_tty<TTY_END;p_tty++) {
-		init_tty(p_tty);
-	}
-	select_console(0);
 	while (1) {
 		for (p_tty=TTY_FIRST;p_tty<TTY_END;p_tty++) {
 			tty_do_read(p_tty);
@@ -45,10 +38,22 @@ PUBLIC void task_tty()
 	}
 }
 
+PUBLIC void init_tty()
+{
+		TTY*	p_tty;
+
+		init_keyboard();
+
+		for (p_tty=TTY_FIRST;p_tty<TTY_END;p_tty++) {
+			tty_init(p_tty);
+		}
+		select_console(0);
+}
+
 /*======================================================================*
 			   init_tty
  *======================================================================*/
-PRIVATE void init_tty(TTY* p_tty)
+PRIVATE void tty_init(TTY* p_tty)
 {
 	p_tty->inbuf_count = 0;
 	p_tty->p_inbuf_head = p_tty->p_inbuf_tail = p_tty->in_buf;
