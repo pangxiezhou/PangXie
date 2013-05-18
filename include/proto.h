@@ -50,6 +50,7 @@ PUBLIC  int     printf(const char *fmt, ...);
 PUBLIC int 	   printl(const char *fmt, ...);
 /* vsprintf.c */
 PUBLIC  int     vsprintf(char *buf, const char *fmt, va_list args);
+PUBLIC	 int 	  sprintf(char *buf, const char *fmt, ...);
 
 /* 以下是系统调用相关 */
 

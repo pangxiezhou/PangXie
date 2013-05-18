@@ -5,7 +5,7 @@
                                                     Forrest Yu, 2005
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-
+#include "fs.h"
 typedef struct s_stackframe {	/* proc_ptr points here				↑ Low			*/
 	u32	gs;		/* ┓						│			*/
 	u32	fs;		/* ┃						│			*/
@@ -41,6 +41,7 @@ typedef struct s_proc {
 	char p_name[16];           /* name of the process */
 
 	int nr_tty;
+	struct file_desc * filp[NR_FILES];
 }PROCESS;
 
 typedef struct s_task {

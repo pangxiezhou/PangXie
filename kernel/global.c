@@ -34,5 +34,11 @@ PUBLIC	CONSOLE		console_table[NR_CONSOLES];
 
 PUBLIC	irq_handler	irq_table[NR_IRQ];
 
-PUBLIC	system_call	sys_call_table[NR_SYS_CALL] = {sys_get_ticks, sys_write};
+PUBLIC	system_call	sys_call_table[NR_SYS_CALL] = {sys_get_ticks, sys_write, sys_open, sys_close};
+
+/**
+ * 6MB~7MB: buffer for FS
+ */
+PUBLIC	u8 *		fsbuf		= (u8*)0x600000;
+PUBLIC	const int	FSBUF_SIZE	= 0x100000;
 

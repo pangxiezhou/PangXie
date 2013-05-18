@@ -14,6 +14,7 @@
 #include "console.h"
 #include "global.h"
 #include "proto.h"
+#include "fs.h"
 
 
 /*======================================================================*
@@ -93,6 +94,7 @@ PUBLIC int kernel_main()
 	//init_keyboard();
 	init_tty();
 	init_hd();
+	init_fs();
 	restart();
 
 	while(1){}

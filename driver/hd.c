@@ -257,7 +257,7 @@ PUBLIC void hd_rdwt_block(int device, u64 pos, int count, void* buf, int rw)
 	sect_nr += device < MAX_PRIM ?
 		hd_info[drive].primary[device].base :
 		hd_info[drive].logical[logidx].base;
-	printl("sector_nr %d \n",sect_nr);
+	//printl("sector_nr %d \n",sect_nr);
 	struct hd_cmd cmd;
 	cmd.features	= 0;
 	cmd.count	= (count + SECTOR_SIZE - 1) / SECTOR_SIZE;
@@ -282,7 +282,7 @@ PUBLIC void hd_rdwt_block(int device, u64 pos, int count, void* buf, int rw)
 		else {
 
 			while(in_byte(REG_STATUS)&STATUS_DRQ!=STATUS_DRQ) ;
-			printl("Data Require Input \n");
+			//printl("Data Require Input \n");
 			port_write(REG_DATA, la, bytes);
 			while(!DataReady) ;
 			DataReady = 0;
@@ -292,6 +292,15 @@ PUBLIC void hd_rdwt_block(int device, u64 pos, int count, void* buf, int rw)
 	}
 }
 
+PUBLIC struct part_info* get_geo(int device)
+{
+	int drive = DRV_OF_DEV(device);
+	struct hd_info* hdi = &hd_info[drive];
+	return  device < MAX_PRIM ?
+					   &hdi->primary[device] :
+					   &hdi->logical[(device - MINOR_hd1a) %
+							NR_SUB_PER_DRIVE];
+}
 PRIVATE void hd_cmd_out(struct hd_cmd* cmd)
 {
 
