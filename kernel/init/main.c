@@ -28,7 +28,7 @@ PUBLIC int kernel_main()
 	PROCESS*	p_proc		= proc_table;
 	char*		p_task_stack	= task_stack + STACK_SIZE_TOTAL;
 	u16		selector_ldt	= SELECTOR_LDT_FIRST;
-	int i;
+	int i,j;
         u8              privilege;
         u8              rpl;
         int             eflags;
@@ -74,6 +74,9 @@ PUBLIC int kernel_main()
 		p_proc++;
 		p_task++;
 		selector_ldt += 1 << 3;
+		//filesystem relate structure initialize
+		for (j = 0; j < NR_FILES; j++)
+			p_proc->filp[j] = 0;
 	}
 
 	proc_table[0].ticks = proc_table[0].priority = 15;
@@ -106,6 +109,10 @@ PUBLIC int kernel_main()
 void TestA()
 {
 	int i = 0;
+	int fd = open("/Test2",O_CREAT);
+	printf("process open file success %d \n",fd);
+	int ret = close(fd);
+	printf("Process close file success %d \n", ret);
 	while (1) {
 		//printf("<Ticks:%x>", get_ticks());
 		milli_delay(200);

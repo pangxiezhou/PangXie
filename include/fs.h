@@ -120,8 +120,26 @@ struct file_desc {
  */
 #define	DIR_ENTRY_SIZE	sizeof(struct dir_entry)
 #define	NR_FILES 64
+#define	NR_FILES	64
+#define	NR_FILE_DESC	64	/* FIXME */
+#define	NR_INODE	64	/* FIXME */
+#define	NR_SUPER_BLOCK	8
+
+#define	STR_DEFAULT_LEN	1024
+
+#define	O_CREAT		1
+#define	O_RDWR		2
+#define	MAX_PATH	128
+
 PUBLIC void init_fs();
 PUBLIC int sys_open(const char* pathname, int flags);
 PUBLIC int sys_close(int fd);
-
+PUBLIC struct inode * get_inode(int dev, int num);
+PUBLIC struct inode * create_file(const char * path, int flags);
+PUBLIC int search_file(const char * path);
+PUBLIC int strip_path(char * filename, const char * pathname,
+		      struct inode** ppinode);
+PUBLIC void sync_inode(struct inode * p);
+PUBLIC void put_inode(struct inode * pinode);
+PUBLIC  struct super_block * get_super_block(int dev);
 #endif /* FS_H_ */

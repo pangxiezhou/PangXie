@@ -19,20 +19,100 @@
 #include "fs.h"
 
 PRIVATE void mkfs();
+//PRIVATE struct super_block* get_super_block(int device);
+PRIVATE void read_super_block(int device);
 PUBLIC void init_fs()
 {
+
+	int i;
+
+	/* f_desc_table[] */
+	for (i = 0; i < NR_FILE_DESC; i++)
+		memset(&f_desc_table[i], 0, sizeof(struct file_desc));
+
+	/* inode_table[] */
+	for (i = 0; i < NR_INODE; i++)
+		memset(&inode_table[i], 0, sizeof(struct inode));
+
+	struct super_block * sb = super_block;
+		for (; sb < &super_block[NR_SUPER_BLOCK]; sb++)
+			sb->sb_dev = NO_DEV;
+
 	mkfs();
+
+	read_super_block(ROOT_DEV);
+
+	sb = get_super_block(ROOT_DEV);
+	//assert(sb->magic == MAGIC_V1);
+
+	root_inode = get_inode(ROOT_DEV, ROOT_INODE);
+	//printl("root node nr %d", root_inode->i_num);
 }
 
 PUBLIC int sys_open(const char* pathname, int flags)
 {
-	int fd = -1;
-	return fd;
+		int fd = -1; /* return value */
+
+		/* find a free slot in PROCESS::filp[] */
+		int i;
+		for (i = 0; i < NR_FILES; i++) {
+			if (p_proc_ready->filp[i] == 0) {
+				fd = i;
+				break;
+			}
+		}
+
+		int inode_nr = search_file(pathname);
+
+		struct inode * pin = 0;
+
+		if (flags & O_CREAT) {
+			if (inode_nr) {
+				printl("{FS} file exists.\n");
+				return -1;
+			} else {
+				pin = create_file(pathname, flags);
+			}
+		} else {
+			//assert(flags & O_RDWR);
+
+			char filename[MAX_PATH];
+			struct inode * dir_inode;
+			if (strip_path(filename, pathname, &dir_inode) != 0)
+				return -1;
+			pin = get_inode(dir_inode->i_dev, inode_nr);
+		}
+		if (pin) {
+			/* connects proc with file_descriptor */
+			p_proc_ready->filp[fd] = &f_desc_table[i];
+
+			/* connects file_descriptor with inode */
+			f_desc_table[i].fd_inode = pin;
+
+			f_desc_table[i].fd_mode = flags;
+			f_desc_table[i].fd_cnt = 1;
+			f_desc_table[i].fd_pos = 0;
+
+			int imode = pin->i_mode & I_TYPE_MASK;
+		} else {
+			return -1;
+		}
+
+		return fd;
+
+
 }
+
 
 PUBLIC int sys_close(int fd)
 {
-	return 0;
+	//int fd = fs_msg.FD;
+	put_inode(p_proc_ready->filp[fd]->fd_inode);
+	if (--p_proc_ready->filp[fd]->fd_cnt == 0)
+		p_proc_ready->filp[fd]->fd_inode = 0;
+	p_proc_ready->filp[fd] = 0;
+
+		return 0;
 }
 PRIVATE void mkfs()
 {
@@ -174,4 +254,86 @@ PRIVATE void mkfs()
 
 		printl("Init Filesystem Suceess \n");
 
+}
+
+PRIVATE void read_super_block(int dev)
+{
+	int i;
+
+	hd_rdwt_block(dev, 1*SECTOR_SIZE, 512, fsbuf, 0);
+	/* find a free slot in super_block[] */
+	for (i = 0; i < NR_SUPER_BLOCK; i++)
+		if (super_block[i].sb_dev == NO_DEV)
+			break;
+	//if (i == NR_SUPER_BLOCK)
+		//panic("super_block slots used up");
+
+	//assert(i == 0); /* currently we use only the 1st slot */
+
+	struct super_block * psb = (struct super_block *)fsbuf;
+
+	super_block[i] = *psb;
+	super_block[i].sb_dev = dev;
+}
+
+PUBLIC  struct super_block * get_super_block(int dev)
+{
+	struct super_block * sb = super_block;
+	for (; sb < &super_block[NR_SUPER_BLOCK]; sb++)
+		if (sb->sb_dev == dev)
+			return sb;
+
+	//panic("super block of devie %d not found.\n", dev);
+
+	return 0;
+}
+
+PUBLIC struct inode * get_inode(int dev, int num)
+{
+	if (num == 0)
+		return 0;
+
+	struct inode * p;
+	struct inode * q = (struct inode *)0;
+	for (p = &inode_table[0]; p < &inode_table[NR_INODE]; p++) {
+		if (p->i_cnt) {	/* not a free slot */
+			if ((p->i_dev == dev) && (p->i_num == num)) {
+				/* this is the inode we want */
+				p->i_cnt++;
+				return p;
+			}
+		}
+		else {		/* a free slot */
+			if (!q) /* q hasn't been assigned yet */
+				q = p; /* q <- the 1st free slot */
+		}
+	}
+
+	/*if (!q)
+		panic("the inode table is full");*/
+
+	q->i_dev = dev;
+	q->i_num = num;
+	q->i_cnt = 1;
+
+	struct super_block * sb = get_super_block(dev);
+	int blk_nr = 1 + 1 + sb->nr_imap_sects + sb->nr_smap_sects +
+		((num - 1) / (SECTOR_SIZE / INODE_SIZE));
+	//RD_SECT(dev, blk_nr);
+	hd_rdwt_block(dev, (blk_nr)*512, 512, fsbuf, 0);
+	struct inode * pinode =
+		(struct inode*)((u8*)fsbuf +
+				((num - 1 ) % (SECTOR_SIZE / INODE_SIZE))
+				 * INODE_SIZE);
+	q->i_mode = pinode->i_mode;
+	q->i_size = pinode->i_size;
+	q->i_start_sect = pinode->i_start_sect;
+	q->i_nr_sects = pinode->i_nr_sects;
+	return q;
+}
+
+PUBLIC void put_inode(struct inode * pinode)
+{
+	//assert(pinode->i_cnt > 0);
+	pinode->i_cnt--;
 }

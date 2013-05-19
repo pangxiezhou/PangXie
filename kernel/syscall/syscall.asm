@@ -24,7 +24,7 @@ bits 32
 ;open(const char* pathname, int flags)
 open:
 	mov eax, _NR_open
-	mov ebx, [esp +4】
+	mov ebx, [esp +4]
 	mov ecx, [esp + 8]
 	int		INT_VECTOR_SYS_CALL
 	ret

@@ -16,6 +16,7 @@
 #define	PUBLIC		/* PUBLIC is the opposite of PRIVATE */
 #define	PRIVATE	static	/* PRIVATE x limits the scope of x */
 
+#define	NO_DEV			0
 #define	max(a,b)	((a) > (b) ? (a) : (b))
 #define	min(a,b)	((a) < (b) ? (a) : (b))
 /* Color */
@@ -99,6 +100,6 @@
 #define	AT_WINI_IRQ	14	/* at winchester */
 
 /* system call */
-#define NR_SYS_CALL     2
+#define NR_SYS_CALL     4
 
 #endif /* _ORANGES_CONST_H_ */
