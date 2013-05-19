@@ -125,6 +125,9 @@ void TestA()
 	printf("\n");
 	ret = close(fd);
 	printf("Process close file success %d \n", ret);
+
+	ret = delete("/Test2");
+	printf("Process delete file suceess %d \n",ret);
 	while (1) {
 		//printf("<Ticks:%x>", get_ticks());
 		milli_delay(200);

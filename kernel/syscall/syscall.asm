@@ -14,6 +14,7 @@ _NR_open		equ 2
 _NR_close		equ 3
 _NR_read		equ 4
 _NR_writef		equ 5
+_NR_delete	equ 6
 ; 导出符号
 global	get_ticks
 global	write
@@ -21,9 +22,16 @@ global	open
 global	close
 global	read
 global	writef
+global	delete
 
 bits 32
 [section .text]
+
+delete:
+	mov eax, _NR_delete
+	mov ebx, [esp +4]
+	int		INT_VECTOR_SYS_CALL
+	ret
 
 ;read(int fd, void* buf, int size)
 read:
