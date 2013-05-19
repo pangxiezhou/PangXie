@@ -134,6 +134,8 @@ struct file_desc {
 PUBLIC void init_fs();
 PUBLIC int sys_open(const char* pathname, int flags);
 PUBLIC int sys_close(int fd);
+PUBLIC int sys_writef(int fd, void* buf, int len);
+PUBLIC int sys_read(int fd, void* buf, int len);
 PUBLIC struct inode * get_inode(int dev, int num);
 PUBLIC struct inode * create_file(const char * path, int flags);
 PUBLIC int search_file(const char * path);

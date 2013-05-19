@@ -356,11 +356,11 @@ sys_call:
      push esi
 	push	dword [p_proc_ready]
      sti
-
+	push dword	 [esi + EDXREG - P_STACKBASE]
 	push	ecx
 	push	ebx
     call    [sys_call_table + eax * 4]
-	add	esp, 4 * 3
+	add	esp, 4 * 4
 	pop esi
 
         mov     [esi + EAXREG - P_STACKBASE], eax

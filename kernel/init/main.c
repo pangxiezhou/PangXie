@@ -109,9 +109,21 @@ PUBLIC int kernel_main()
 void TestA()
 {
 	int i = 0;
-	int fd = open("/Test2",O_CREAT);
+	int ret;
+	int fd = open("/Test2",O_CREAT|O_RDWR);
 	printf("process open file success %d \n",fd);
-	int ret = close(fd);
+	u8 wbuf[5]={1,2,3,4,5};
+	u8 rbuf[5];
+	ret = writef(fd, (void*)wbuf,5);
+	printf("Process write file Success %d\n", ret);
+	ret = close(fd);
+	fd = open("/Test2",O_RDWR);
+	ret = read(fd, rbuf, 5);
+	printf("Process read file succcess %d\n",ret);
+	for(i=0;i<5;i++)
+		printf("%d",rbuf[i]);
+	printf("\n");
+	ret = close(fd);
 	printf("Process close file success %d \n", ret);
 	while (1) {
 		//printf("<Ticks:%x>", get_ticks());

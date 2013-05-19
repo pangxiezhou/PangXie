@@ -49,6 +49,114 @@ PUBLIC void init_fs()
 	//printl("root node nr %d", root_inode->i_num);
 }
 
+PUBLIC int sys_writef(int fd, void* buf, int len)
+{
+	if (!(p_proc_ready->filp[fd]->fd_mode & O_RDWR))
+			return 0;
+
+	int pos = p_proc_ready->filp[fd]->fd_pos;
+
+	struct inode * pin = p_proc_ready->filp[fd]->fd_inode;
+	int imode = pin->i_mode & I_TYPE_MASK;
+	int pos_end;
+	pos_end = min(pos + len, pin->i_nr_sects * SECTOR_SIZE);
+
+	int off = pos % SECTOR_SIZE;
+	int rw_sect_min=pin->i_start_sect+(pos>>SECTOR_SIZE_SHIFT);
+	int rw_sect_max=pin->i_start_sect+(pos_end>>SECTOR_SIZE_SHIFT);
+
+	int chunk = min(rw_sect_max - rw_sect_min + 1,
+			FSBUF_SIZE >> SECTOR_SIZE_SHIFT);
+
+	int bytes_rw = 0;
+	int bytes_left = len;
+	int i;
+
+	for (i = rw_sect_min; i <= rw_sect_max; i += chunk) {
+				/* read/write this amount of bytes every time */
+				int bytes = min(bytes_left, chunk * SECTOR_SIZE - off);
+				/*rw_sector(DEV_READ,
+					  pin->i_dev,
+					  i * SECTOR_SIZE,
+					  chunk * SECTOR_SIZE,
+					  TASK_FS,
+					  fsbuf);*/
+				hd_rdwt_block( pin->i_dev,  i * SECTOR_SIZE, chunk * SECTOR_SIZE, fsbuf, 0);
+				/* WRITE */
+				phys_copy((void*)(fsbuf + off),
+						  (void*)(buf + bytes_rw),
+						  bytes);
+					/*rw_sector(DEV_WRITE,
+						  pin->i_dev,
+						  i * SECTOR_SIZE,
+						  chunk * SECTOR_SIZE,
+						  TASK_FS,
+						  fsbuf);*/
+				hd_rdwt_block( pin->i_dev,  i * SECTOR_SIZE, chunk * SECTOR_SIZE, fsbuf, 1);
+				off = 0;
+				bytes_rw += bytes;
+				p_proc_ready->filp[fd]->fd_pos += bytes;
+				bytes_left -= bytes;
+			}
+
+			if (p_proc_ready->filp[fd]->fd_pos > pin->i_size) {
+				/* update inode::size */
+				pin->i_size = p_proc_ready->filp[fd]->fd_pos;
+				/* write the updated i-node back to disk */
+				sync_inode(pin);
+			}
+			return bytes_rw;
+}
+
+PUBLIC int sys_read(int fd, void* buf, int len)
+{
+		if (!(p_proc_ready->filp[fd]->fd_mode & O_RDWR))
+			return 0;
+
+		int pos = p_proc_ready->filp[fd]->fd_pos;
+
+		struct inode * pin = p_proc_ready->filp[fd]->fd_inode;
+
+		//assert(pin >= &inode_table[0] && pin < &inode_table[NR_INODE]);
+
+		int imode = pin->i_mode & I_TYPE_MASK;
+			int pos_end;
+			pos_end = min(pos + len, pin->i_size);
+
+
+			int off = pos % SECTOR_SIZE;
+			int rw_sect_min=pin->i_start_sect+(pos>>SECTOR_SIZE_SHIFT);
+			int rw_sect_max=pin->i_start_sect+(pos_end>>SECTOR_SIZE_SHIFT);
+
+			int chunk = min(rw_sect_max - rw_sect_min + 1,
+					FSBUF_SIZE >> SECTOR_SIZE_SHIFT);
+
+			int bytes_rw = 0;
+			int bytes_left = len;
+			int i;
+			for (i = rw_sect_min; i <= rw_sect_max; i += chunk) {
+				/* read/write this amount of bytes every time */
+				int bytes = min(bytes_left, chunk * SECTOR_SIZE - off);
+				hd_rdwt_block( pin->i_dev,  i * SECTOR_SIZE, chunk * SECTOR_SIZE, fsbuf, 0);
+				phys_copy((void*)(buf + bytes_rw),
+						  (void*)(fsbuf + off),
+						  bytes);
+				off = 0;
+				bytes_rw += bytes;
+				p_proc_ready->filp[fd]->fd_pos += bytes;
+				bytes_left -= bytes;
+			}
+
+			if (p_proc_ready->filp[fd]->fd_pos > pin->i_size) {
+				/* update inode::size */
+				pin->i_size = p_proc_ready->filp[fd]->fd_pos;
+				/* write the updated i-node back to disk */
+				sync_inode(pin);
+			}
+
+			return bytes_rw;
+
+}
 PUBLIC int sys_open(const char* pathname, int flags)
 {
 		int fd = -1; /* return value */

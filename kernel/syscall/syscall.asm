@@ -12,14 +12,35 @@ _NR_get_ticks       equ 0
 _NR_write	    equ 1
 _NR_open		equ 2
 _NR_close		equ 3
+_NR_read		equ 4
+_NR_writef		equ 5
 ; 导出符号
 global	get_ticks
 global	write
 global	open
 global	close
+global	read
+global	writef
 
 bits 32
 [section .text]
+
+;read(int fd, void* buf, int size)
+read:
+	mov eax, _NR_read
+	mov ebx, [esp +4]
+	mov ecx, [esp + 8]
+	mov edx, [esp + 12]
+	int		INT_VECTOR_SYS_CALL
+	ret
+
+writef:
+	mov eax, _NR_writef
+	mov ebx, [esp +4]
+	mov ecx, [esp + 8]
+	mov edx, [esp +12]
+	int		INT_VECTOR_SYS_CALL
+	ret
 
 ;open(const char* pathname, int flags)
 open:
