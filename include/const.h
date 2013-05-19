@@ -100,6 +100,6 @@
 #define	AT_WINI_IRQ	14	/* at winchester */
 
 /* system call */
-#define NR_SYS_CALL     7
+#define NR_SYS_CALL     8
 
 #endif /* _ORANGES_CONST_H_ */

@@ -21,5 +21,10 @@ typedef	void	(*irq_handler)	(int irq);
 
 typedef void*	system_call;
 
+struct boot_params {
+	int		mem_size;	/* memory size */
+	unsigned char *	kernel_file;	/* addr of kernel file */
+};
+
 
 #endif /* _ORANGES_TYPE_H_ */

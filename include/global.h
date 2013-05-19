@@ -29,7 +29,8 @@ EXTERN	int		nr_current_console;
 EXTERN	struct file_desc	f_desc_table[NR_FILE_DESC];
 EXTERN	struct inode		inode_table[NR_INODE];
 EXTERN	struct super_block	super_block[NR_SUPER_BLOCK];
-
+//mm
+EXTERN	int	memory_size;
 
 EXTERN	struct inode *		root_inode;
 extern	PROCESS		proc_table[];

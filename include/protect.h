@@ -71,6 +71,8 @@ typedef struct s_tss {
 #define	INDEX_VIDEO		3	// ┛
 #define	INDEX_TSS		4
 #define	INDEX_LDT_FIRST		5
+
+#define	LIMIT_4K_SHIFT		  12
 /* 选择子 */
 #define	SELECTOR_DUMMY		   0		// ┓
 #define	SELECTOR_FLAT_C		0x08		// ┣ LOADER 里面已经确定了的.
@@ -149,6 +151,6 @@ typedef struct s_tss {
 /* 宏 */
 /* 线性地址 → 物理地址 */
 #define vir2phys(seg_base, vir)	(u32)(((u32)seg_base) + (u32)(vir))
-
-
+PUBLIC  void init_idt_desc(unsigned char vector, u8 desc_type, int_handler handler, unsigned char privilege);
+PUBLIC void init_descriptor(DESCRIPTOR * p_desc, u32 base, u32 limit, u16 attribute);
 #endif /* _ORANGES_PROTECT_H_ */

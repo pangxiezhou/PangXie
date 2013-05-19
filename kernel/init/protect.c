@@ -16,8 +16,7 @@
 
 
 /* 本文件内函数声明 */
-PRIVATE void init_idt_desc(unsigned char vector, u8 desc_type, int_handler handler, unsigned char privilege);
-PRIVATE void init_descriptor(DESCRIPTOR * p_desc, u32 base, u32 limit, u16 attribute);
+
 
 
 /* 中断处理函数 */
@@ -223,7 +222,7 @@ PUBLIC u32 seg2phys(u16 seg)
  *----------------------------------------------------------------------*
  初始化段描述符
  *======================================================================*/
-PRIVATE void init_descriptor(DESCRIPTOR * p_desc, u32 base, u32 limit, u16 attribute)
+PUBLIC void init_descriptor(DESCRIPTOR * p_desc, u32 base, u32 limit, u16 attribute)
 {
 	p_desc->limit_low		= limit & 0x0FFFF;		// 段界限 1		(2 字节)
 	p_desc->base_low		= base & 0x0FFFF;		// 段基址 1		(2 字节)

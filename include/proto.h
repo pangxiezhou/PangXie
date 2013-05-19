@@ -18,6 +18,8 @@ PUBLIC u32	seg2phys(u16 seg);
 /* klib.c */
 PUBLIC void	delay(int time);
 
+PUBLIC void get_boot_params(struct boot_params * pbp);
+PUBLIC int get_kernel_map(unsigned int * b, unsigned int * l);
 /* kernel.asm */
 void restart();
 
@@ -25,6 +27,7 @@ void restart();
 void TestA();
 void TestB();
 void TestC();
+void Init();
 
 /* i8259.c */
 PUBLIC void put_irq_handler(int irq, irq_handler handler);

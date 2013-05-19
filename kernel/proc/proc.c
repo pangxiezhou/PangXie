@@ -25,12 +25,15 @@ PUBLIC void schedule()
 
 	while (!greatest_ticks) {
 		for (p = proc_table; p < proc_table+NR_TASKS+NR_PROCS; p++) {
-			if (p->ticks > greatest_ticks) {
-				greatest_ticks = p->ticks;
-				p_proc_ready = p;
+			if (p->p_flags == 0) {
+				if (p->ticks > greatest_ticks) {
+					greatest_ticks = p->ticks;
+					p_proc_ready = p;
+				}
+				//printl("Greatest Ticks %d \n",greatest_ticks);
 			}
 		}
-
+		//printl("process Ready Name %s \n", p_proc_ready->p_name);
 		if (!greatest_ticks) {
 			for(p=proc_table;p<proc_table+NR_TASKS+NR_PROCS;p++) {
 				p->ticks = p->priority;
