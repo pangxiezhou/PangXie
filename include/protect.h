@@ -148,6 +148,12 @@ typedef struct s_tss {
 /* 系统调用 */
 #define INT_VECTOR_SYS_CALL             0x90
 
+
+#define	reassembly(high, high_shift, mid, mid_shift, low)	\
+	(((high) << (high_shift)) +				\
+	 ((mid)  << (mid_shift)) +				\
+	 (low))
+
 /* 宏 */
 /* 线性地址 → 物理地址 */
 #define vir2phys(seg_base, vir)	(u32)(((u32)seg_base) + (u32)(vir))

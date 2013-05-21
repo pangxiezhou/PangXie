@@ -26,8 +26,8 @@ PUBLIC int kernel_main()
 
 	TASK* p_task = task_table;
 	PROCESS* p_proc = proc_table;
-	char* p_task_stack = task_stack + STACK_SIZE_TOTAL;
-	u16 selector_ldt = SELECTOR_LDT_FIRST;
+	char* p_task_stack = task_stack + STACK_SIZE_TOTAL - STACK_SIZE_INIT;
+	//u16 selector_ldt = SELECTOR_LDT_FIRST;
 	int i, j;
 	u8 privilege;
 	u8 rpl;
@@ -56,7 +56,7 @@ PUBLIC int kernel_main()
 		strcpy(p_proc->p_name, p_task->name);	// name of the process
 		p_proc->pid = i;			// pid
 
-		p_proc->ldt_sel = selector_ldt;
+		//p_proc->ldt_sel = selector_ldt;
 
 		if (strcmp(p_proc->p_name, "INIT") != 0) {
 			p_proc->ldts[INDEX_LDT_C] = gdt[SELECTOR_KERNEL_CS >> 3];
@@ -102,7 +102,7 @@ PUBLIC int kernel_main()
 		p_proc++;
 		p_task++;
 		//p_proc->ticks = p_proc->priority = ticks;
-		selector_ldt += 1 << 3;
+		//selector_ldt += 1 << 3;
 		//filesystem relate structure initialize
 		for (j = 0; j < NR_FILES; j++)
 			p_proc->filp[j] = 0;
@@ -143,7 +143,7 @@ void TestA()
 {
 	int i = 0;
 	int ret;
-	int fd = open("/Test2",O_CREAT|O_RDWR);
+	/*int fd = open("/Test2",O_CREAT|O_RDWR);
 	printf("process open file success %d \n",fd);
 	u8 wbuf[5]={1,2,3,4,5};
 	u8 rbuf[5];
@@ -160,16 +160,38 @@ void TestA()
 	printf("Process close file success %d \n", ret);
 
 	ret = delete("/Test2");
-	printf("Process delete file suceess %d \n",ret);
+	printf("Process delete file suceess %d \n",ret);*/
 	while (1) {
 		//printf("<Ticks:%x>", get_ticks());
-		milli_delay(200);
+		//milli_delay(200);
 	}
 }
 void Init()
 {
-	printf("Init Process \n");
-	while(1);
+	//printf("Init Process \n");
+	//int pid =0;
+	//printf("hehehe %d \n", 1);
+	int pid = fork();
+	//goin(pid);
+	if(pid){
+		printf("This parent \n");
+
+	}else
+	{
+		printf("This Child  \n");
+	}
+	//printf("Test before \n");
+	//printf("Process pid   \n");
+	//printf("Test After \n");
+	/*if(pid){
+		printf("This is Parent Process \n");
+	}else{
+		printf("This is Child Process  \n");
+	}*/
+	while(1){
+			//printf("init \n");
+			milli_delay(200);
+		}
 }
 /*======================================================================*
                                TestB
@@ -179,7 +201,7 @@ void TestB()
 	int i = 0x1000;
 	while(1){
 		//printf("B");
-		milli_delay(200);
+		//milli_delay(200);
 	}
 }
 
@@ -191,6 +213,6 @@ void TestC()
 	int i = 0x2000;
 	while(1){
 		//printf("C");
-		milli_delay(200);
+		//milli_delay(200);
 	}
 }

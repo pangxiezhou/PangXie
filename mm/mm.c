@@ -29,7 +29,23 @@ PUBLIC void init_mm()
 
 }
 
-PUBLIC int sys_fork()
+
+
+PUBLIC int alloc_mem(int pid, int memsize)
 {
-	return 0;
+	//assert(pid >= (NR_TASKS + NATIVE_PROCS));
+	if (memsize > PROC_IMAGE_SIZE_DEFAULT) {
+		printl("unsupported memory request: %d. "
+		      "(should be less than %d)",
+		      memsize,
+		      PROC_IMAGE_SIZE_DEFAULT);
+	}
+
+	int base = PROCS_BASE +
+		(pid - (NR_TASKS + NATIVE_PROCS)) * PROC_IMAGE_SIZE_DEFAULT;
+
+	if (base + memsize >= memory_size)
+		printl("memory allocation failed. pid:%d", pid);
+
+	return base;
 }

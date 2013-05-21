@@ -176,7 +176,24 @@ PUBLIC void tty_write(TTY* p_tty, char* buf, int len)
 *======================================================================*/
 PUBLIC int sys_write(char* buf, int len, PROCESS* p_proc)
 {
-        tty_write(&tty_table[p_proc->nr_tty], buf, len);
+		void* bufInside;
+		bufInside = va2la(p_proc_ready->pid, buf);
+        tty_write(&tty_table[p_proc_ready->nr_tty], bufInside, len);
         return 0;
+}
+
+PUBLIC int printl(const char *fmt, ...)
+{
+	int i;
+	char buf[256];
+
+	va_list arg = (va_list)((char*)(&fmt) + 4); /**
+						     * 4: size of `fmt' in
+						     *    the stack
+						     */
+	i = vsprintf(buf, fmt, arg);
+	tty_write(&tty_table[0],buf,i);
+
+	return i;
 }
 

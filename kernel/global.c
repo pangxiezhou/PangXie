@@ -37,8 +37,10 @@ PUBLIC	CONSOLE		console_table[NR_CONSOLES];
 PUBLIC	irq_handler	irq_table[NR_IRQ];
 
 PUBLIC	system_call	sys_call_table[NR_SYS_CALL] = {sys_get_ticks, sys_write, sys_open, sys_close
-																				,sys_read, sys_writef, sys_delete,sys_fork};
+																			,sys_read, sys_writef, sys_delete,sys_fork,sys_goin};
 
+//for fork debug
+//PUBLIC int	testldt = 80;
 /**
  * 6MB~7MB: buffer for FS
  */

@@ -10,5 +10,6 @@
 
 PUBLIC int	sys_fork();
 PUBLIC void init_mm();
-
+PUBLIC int alloc_mem(int pid, int memsize);
+PUBLIC void sys_goin(int pid);
 #endif /* MM_H_ */

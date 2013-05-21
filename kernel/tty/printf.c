@@ -63,23 +63,11 @@ int printf(const char *fmt, ...)
 
 	va_list arg = (va_list)((char*)(&fmt) + 4); /*4是参数fmt所占堆栈中的大小*/
 	i = vsprintf(buf, fmt, arg);
+	//goin(i);
 	write(buf, i);
 
 	return i;
 }
 
-PUBLIC int printl(const char *fmt, ...)
-{
-	int i;
-	char buf[256];
 
-	va_list arg = (va_list)((char*)(&fmt) + 4); /**
-						     * 4: size of `fmt' in
-						     *    the stack
-						     */
-	i = vsprintf(buf, fmt, arg);
-	tty_write(&tty_table[0],buf,i);
-
-	return i;
-}
 

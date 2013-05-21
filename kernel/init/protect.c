@@ -177,9 +177,10 @@ PUBLIC void init_prot()
 	PROCESS* p_proc	= proc_table;
 	u16 selector_ldt = INDEX_LDT_FIRST << 3;
 	for (i = 0; i < NR_TASKS+NR_PROCS; i++){
+		memset(&proc_table[i], 0, sizeof(struct proc));
+		proc_table[i].ldt_sel = selector_ldt;
 		init_descriptor(&gdt[selector_ldt>>3],
-				vir2phys(seg2phys(SELECTOR_KERNEL_DS),
-					proc_table[i].ldts),
+					(u32)proc_table[i].ldts,
 				LDT_SIZE * sizeof(DESCRIPTOR) - 1,
 				DA_LDT);
 		p_proc++;

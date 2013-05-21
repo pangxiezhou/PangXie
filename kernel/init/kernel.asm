@@ -17,6 +17,8 @@ extern	clock_handler
 extern	disp_str
 extern	delay
 extern	irq_table
+;extern	testldt
+
 
 ; 导入全局变量
 extern	gdt_ptr
@@ -352,7 +354,7 @@ save:
 ;                                 sys_call
 ; ====================================================================================
 sys_call:
-     call    save
+    call    save
      push esi
 	push	dword [p_proc_ready]
      sti
@@ -365,6 +367,7 @@ sys_call:
 
         mov     [esi + EAXREG - P_STACKBASE], eax
         cli
+       ; lldt	[testldt]
         ret
 
 

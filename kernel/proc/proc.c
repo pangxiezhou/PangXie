@@ -33,7 +33,8 @@ PUBLIC void schedule()
 				//printl("Greatest Ticks %d \n",greatest_ticks);
 			}
 		}
-		//printl("process Ready Name %s \n", p_proc_ready->p_name);
+		//printl("process Ready Name %s  eax :%d  Ldt Sele %d\n", p_proc_ready->p_name,p_proc_ready->regs.eax
+		//		,p_proc_ready->ldt_sel);
 		if (!greatest_ticks) {
 			for(p=proc_table;p<proc_table+NR_TASKS+NR_PROCS;p++) {
 				p->ticks = p->priority;
@@ -48,5 +49,23 @@ PUBLIC void schedule()
 PUBLIC int sys_get_ticks()
 {
 	return ticks;
+}
+
+
+PUBLIC int ldt_seg_linear(struct proc* p, int idx)
+{
+	DESCRIPTOR* d = &p->ldts[idx];
+
+	return d->base_high << 24 | d->base_mid << 16 | d->base_low;
+}
+
+PUBLIC void* va2la(int pid, void* va)
+{
+	struct proc* p = &proc_table[pid];
+	//printl("trans Pid %d \n",pid);
+	u32 seg_base = ldt_seg_linear(p, INDEX_LDT_RW);
+	//printl("segment Base %d, Virtual Addr %d \n",seg_base,va);
+	u32 la = seg_base + (u32)va;
+	return (void*)la;
 }
 

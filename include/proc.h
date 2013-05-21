@@ -28,7 +28,7 @@ typedef struct s_stackframe {	/* proc_ptr points here				↑ Low			*/
 }STACK_FRAME;
 
 
-typedef struct s_proc {
+typedef struct proc {
 	STACK_FRAME regs;          /* process registers saved in stack frame */
 
 	u16 ldt_sel;               /* gdt selector giving ldt base and limit */
@@ -42,7 +42,7 @@ typedef struct s_proc {
 
 	int nr_tty;
 	struct file_desc * filp[NR_FILES];
-
+	int p_parent;
 	int  p_flags;
 }PROCESS;
 
@@ -52,6 +52,10 @@ typedef struct s_task {
 	char	name[32];
 }TASK;
 
+
+#define	PROCS_BASE		0xA00000 /* 10 MB */
+#define	PROC_IMAGE_SIZE_DEFAULT	0x100000 /*  1 MB */
+#define	PROC_ORIGIN_STACK	0x400    /*  1 KB */
 
 /* Number of tasks & procs */
 #define NR_TASKS	1
@@ -73,5 +77,7 @@ typedef struct s_task {
 				STACK_SIZE_TESTA + \
 				STACK_SIZE_TESTB + \
 				STACK_SIZE_TESTC	+\
+				STACK_SIZE_INIT		+	\
 				STACK_SIZE_INIT)
-
+PUBLIC void* va2la(int pid, void* va);
+PUBLIC int ldt_seg_linear(struct proc* p, int idx);

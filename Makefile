@@ -30,7 +30,7 @@ OBJS		= kernel/init/kernel.o kernel/syscall/syscall.o kernel/init/start.o kernel
 			kernel/tty/printf.o kernel/tty/vsprintf.o\
 			lib/kliba.o lib/klib.o lib/string.o driver/hd.o fs/fs.o fs/misc.o\
 			lib/misc.o\
-			mm/mm.o
+			mm/mm.o mm/fork.o
 DASMOUTPUT	= kernel.bin.asm
 
 # All Phony Targets
@@ -42,6 +42,7 @@ nop :
 
 everything : $(ORANGESBOOT) $(ORANGESKERNEL)
 
+bearCrt : lib/Crt.a
 all : realclean everything
 
 image : realclean everything clean buildimg
@@ -62,6 +63,9 @@ buildimg :
 	sudo cp -fv boot/loader.bin /mnt/floppy/
 	sudo cp -fv kernel.bin /mnt/floppy
 	sudo umount /mnt/floppy
+
+lib/Crt.a :	kernel/syscall/syscall.o kernel/tty/printf.o kernel/tty/vsprintf.o	 lib/misc.o  lib/string.o
+	ar rcs	lib/Crt.a	kernel/syscall/syscall.o kernel/tty/printf.o kernel/tty/vsprintf.o	 lib/misc.o  lib/string.o
 
 boot/boot.bin : boot/boot.asm boot/include/load.inc boot/include/fat12hdr.inc
 	$(ASM) $(ASMBFLAGS) -o $@ $<

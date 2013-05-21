@@ -16,6 +16,7 @@ _NR_read		equ 4
 _NR_writef		equ 5
 _NR_delete	equ 6
 _NR_fork		equ 7
+_NR_goin		equ 8
 ; 导出符号
 global	get_ticks
 global	write
@@ -23,19 +24,33 @@ global	open
 global	close
 global	read
 global	writef
-global	delete
+global	deletef
 global	fork
+global	goin
 
+
+;debug
+extern debug
 bits 32
 [section .text]
 ;int fork();
 
-fork:
-	mov eax, _NR_fork
+goin:
+	mov eax, _NR_goin
+	 mov ebx, [esp +4]
 	int		INT_VECTOR_SYS_CALL
 	ret
 
-delete:
+fork:
+	mov eax, _NR_fork
+	int		INT_VECTOR_SYS_CALL
+	;push eax
+	;call debug
+	;pop eax
+	;mov eax, 10
+	ret
+
+deletef:
 	mov eax, _NR_delete
 	mov ebx, [esp +4]
 	int		INT_VECTOR_SYS_CALL
