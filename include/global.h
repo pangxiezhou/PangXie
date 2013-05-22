@@ -43,3 +43,6 @@ extern  CONSOLE         console_table[];
 extern	u8 *			fsbuf;
 extern	const int		FSBUF_SIZE;
 
+extern	u8 *			mmbuf;
+extern	const int		MMBUF_SIZE;
+

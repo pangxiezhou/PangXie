@@ -131,6 +131,8 @@ struct file_desc {
 #define	O_RDWR		2
 #define	MAX_PATH	128
 
+
+
 PUBLIC void init_fs();
 PUBLIC int sys_open(const char* pathname, int flags);
 PUBLIC int sys_close(int fd);
@@ -145,4 +147,6 @@ PUBLIC int strip_path(char * filename, const char * pathname,
 PUBLIC void sync_inode(struct inode * p);
 PUBLIC void put_inode(struct inode * pinode);
 PUBLIC  struct super_block * get_super_block(int dev);
+//for kernel read
+PUBLIC int kread(const char* pathname, void* buf, int pos, int len);
 #endif /* FS_H_ */

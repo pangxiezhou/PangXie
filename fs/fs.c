@@ -47,6 +47,13 @@ PUBLIC void init_fs()
 
 	root_inode = get_inode(ROOT_DEV, ROOT_INODE);
 	//printl("root node nr %d", root_inode->i_num);
+
+	//for kernel kread fun test
+	/*u8 buf[10];
+	kread("/echo",(void*)buf,0,10);
+	for(i=0;i<10;i++)
+		printl("%d ",buf[i]);
+	printl("\n");*/
 }
 
 PUBLIC int sys_writef(int fd, void* buf, int len)
@@ -472,7 +479,7 @@ PRIVATE void mkfs()
 					  *   || |`----- bit 2 : /dev_tty0
 					  *   || `------ bit 3 : /dev_tty1
 					  *   |`-------- bit 4 : /dev_tty2
-					  *   `--------- bit 5 : /cmd.tar
+					  *   `--------- bit 5 : /echo
 					  */
 		//WR_SECT(ROOT_DEV, 2);
 		hd_rdwt_block(ROOT_DEV, 2*512, 512, fsbuf, 1);
@@ -498,8 +505,31 @@ PRIVATE void mkfs()
 		for (i = 1; i < sb.nr_smap_sects; i++)
 			//WR_SECT(ROOT_DEV, 2 + sb.nr_imap_sects + i);
 			hd_rdwt_block(ROOT_DEV, ( 2 + sb.nr_imap_sects + i)*512, 512, fsbuf, 1);
-
-
+		//for echo command
+		int bit_offset = INSTALL_START_SECT -
+				sb.n_1st_sect + 1; /* sect M <-> bit (M - sb.n_1stsect + 1) */
+			int bit_off_in_sect = bit_offset % (SECTOR_SIZE * 8);
+			int bit_left = INSTALL_NR_SECTS;
+			int cur_sect = bit_offset / (SECTOR_SIZE * 8);
+			//RD_SECT(ROOT_DEV, 2 + sb.nr_imap_sects + cur_sect);
+			hd_rdwt_block(ROOT_DEV, ( 2 + sb.nr_imap_sects + cur_sect)*512, 512, fsbuf, 0);
+			while (bit_left) {
+				int byte_off = bit_off_in_sect / 8;
+				/* this line is ineffecient in a loop, but I don't care */
+				fsbuf[byte_off] |= 1 << (bit_off_in_sect % 8);
+				bit_left--;
+				bit_off_in_sect++;
+				if (bit_off_in_sect == (SECTOR_SIZE * 8)) {
+					//WR_SECT(ROOT_DEV, 2 + sb.nr_imap_sects + cur_sect);
+					hd_rdwt_block(ROOT_DEV, ( 2 + sb.nr_imap_sects + cur_sect)*512, 512, fsbuf, 1);
+					cur_sect++;
+					//RD_SECT(ROOT_DEV, 2 + sb.nr_imap_sects + cur_sect);
+					hd_rdwt_block(ROOT_DEV, ( 2 + sb.nr_imap_sects + cur_sect)*512, 512, fsbuf, 0);
+					bit_off_in_sect = 0;
+				}
+			}
+			//WR_SECT(ROOT_DEV, 2 + sb.nr_imap_sects + cur_sect);
+			hd_rdwt_block(ROOT_DEV, (2 + sb.nr_imap_sects + cur_sect)*512, 512, fsbuf, 1);
 
 		/************************/
 		/*       inodes         */
@@ -523,6 +553,11 @@ PRIVATE void mkfs()
 			pi->i_start_sect = 0;
 			pi->i_nr_sects = 0;
 		}
+		pi = (struct inode*)(fsbuf + (INODE_SIZE * (NR_CONSOLES + 1)));
+		pi->i_mode = I_REGULAR;
+		pi->i_size = INSTALL_NR_SECTS * SECTOR_SIZE;
+		pi->i_start_sect = INSTALL_START_SECT;
+		pi->i_nr_sects = INSTALL_NR_SECTS;
 		//WR_SECT(ROOT_DEV, 2 + sb.nr_imap_sects + sb.nr_smap_sects);
 		hd_rdwt_block(ROOT_DEV, (2 + sb.nr_imap_sects + sb.nr_smap_sects)*512, 512, fsbuf, 1);
 		/************************/
@@ -540,8 +575,8 @@ PRIVATE void mkfs()
 			pde->inode_nr = i + 2; /* dev_tty0's inode_nr is 2 */
 			sprintf(pde->name, "dev_tty%d", i);
 		}
-		//(++pde)->inode_nr = NR_CONSOLES + 2;
-		//sprintf(pde->name, "cmd.tar", i);
+		(++pde)->inode_nr = NR_CONSOLES + 2;
+		sprintf(pde->name, "echo", i);
 		//WR_SECT(ROOT_DEV, sb.n_1st_sect);
 		hd_rdwt_block(ROOT_DEV, ( sb.n_1st_sect)*512, 512, fsbuf, 1);
 
@@ -625,6 +660,46 @@ PUBLIC struct inode * get_inode(int dev, int num)
 	return q;
 }
 
+PUBLIC int kread(const char* pathname, void* buf, int pos, int len)
+{
+		int inode_nr = search_file(pathname);
+		printl("find echo node_nr %d \n",inode_nr);
+		struct inode * dir_inode;
+		struct inode * pin=0;
+		char filename[MAX_PATH];
+		if (strip_path(filename, pathname, &dir_inode) != 0)
+						return -1;
+		pin = get_inode(dir_inode->i_dev, inode_nr);
+		printl("get node Success %d  start %x size %d\n", pin->i_num, pin->i_start_sect ,pin->i_size);
+		int imode = pin->i_mode & I_TYPE_MASK;
+		int pos_end;
+		pos_end = min(pos + len, pin->i_size);
+
+		int off = pos % SECTOR_SIZE;
+		int rw_sect_min = pin->i_start_sect + (pos >> SECTOR_SIZE_SHIFT);
+		int rw_sect_max = pin->i_start_sect + (pos_end >> SECTOR_SIZE_SHIFT);
+
+		/*int chunk = min(rw_sect_max - rw_sect_min + 1,
+				FSBUF_SIZE >> SECTOR_SIZE_SHIFT);*/
+		//printl("chunk is %d \n",chunk);
+		int bytes_rw = 0;
+		int bytes_left = len;
+		int i;
+		for (i = rw_sect_min; i <= rw_sect_max; i += 1) {
+			/* read/write this amount of bytes every time */
+			int bytes = min(bytes_left,  SECTOR_SIZE - off);
+			hd_rdwt_block(pin->i_dev, i * SECTOR_SIZE, SECTOR_SIZE, fsbuf,
+					0);
+
+			phys_copy((void*) (buf + bytes_rw), (void*) (fsbuf + off), bytes);
+			off = 0;
+			bytes_rw += bytes;
+			bytes_left -= bytes;
+		}
+		printl("Read success \n");
+		return bytes_rw;
+
+}
 PUBLIC void put_inode(struct inode * pinode)
 {
 	//assert(pinode->i_cnt > 0);

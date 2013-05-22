@@ -141,25 +141,25 @@ PUBLIC int kernel_main()
  *======================================================================*/
 void TestA()
 {
-	int i = 0;
+	/*int i = 0;
 	int ret;
-	/*int fd = open("/Test2",O_CREAT|O_RDWR);
+	int fd = open("/Test2",O_CREAT|O_RDWR);
 	printf("process open file success %d \n",fd);
-	u8 wbuf[5]={1,2,3,4,5};
+	//u8 wbuf[5]={1,2,3,4,5};
 	u8 rbuf[5];
-	ret = writef(fd, (void*)wbuf,5);
-	printf("Process write file Success %d\n", ret);
+	//ret = writef(fd, (void*)wbuf,5);
+	//printf("Process write file Success %d\n", ret);
 	ret = close(fd);
-	fd = open("/Test2",O_RDWR);
+	fd = open("/echo",O_RDWR);
 	ret = read(fd, rbuf, 5);
 	printf("Process read file succcess %d\n",ret);
 	for(i=0;i<5;i++)
 		printf("%d",rbuf[i]);
 	printf("\n");
 	ret = close(fd);
-	printf("Process close file success %d \n", ret);
+	printf("Process close file success %d \n", ret);*/
 
-	ret = delete("/Test2");
+	/*ret = delete("/Test2");
 	printf("Process delete file suceess %d \n",ret);*/
 	while (1) {
 		//printf("<Ticks:%x>", get_ticks());
@@ -179,6 +179,7 @@ void Init()
 	}else
 	{
 		printf("This Child  \n");
+		bearexec("/echo");
 	}
 	//printf("Test before \n");
 	//printf("Process pid   \n");

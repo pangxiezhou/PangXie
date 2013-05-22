@@ -272,10 +272,12 @@ PUBLIC void hd_rdwt_block(int device, u64 pos, int count, void* buf, int rw)
 	void * la = buf;
 
 	while (bytes_left>0) {
+		//printl("Read Start Loop \n");
 		int bytes = min(SECTOR_SIZE, bytes_left);
 		if (rw==0) {
 			while(!DataReady) ;
 			DataReady = 0;
+			//printl("Read Data Ready \n");
 			port_read(REG_DATA, hdbuf, SECTOR_SIZE);
 			phys_copy(la,  hdbuf, bytes);
 		}
