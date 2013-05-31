@@ -663,14 +663,14 @@ PUBLIC struct inode * get_inode(int dev, int num)
 PUBLIC int kread(const char* pathname, void* buf, int pos, int len)
 {
 		int inode_nr = search_file(pathname);
-		printl("find echo node_nr %d \n",inode_nr);
+		//printl("find echo node_nr %d \n",inode_nr);
 		struct inode * dir_inode;
 		struct inode * pin=0;
 		char filename[MAX_PATH];
 		if (strip_path(filename, pathname, &dir_inode) != 0)
 						return -1;
 		pin = get_inode(dir_inode->i_dev, inode_nr);
-		printl("get node Success %d  start %x size %d\n", pin->i_num, pin->i_start_sect ,pin->i_size);
+		//printl("get node Success %d  start %x size %d\n", pin->i_num, pin->i_start_sect ,pin->i_size);
 		int imode = pin->i_mode & I_TYPE_MASK;
 		int pos_end;
 		pos_end = min(pos + len, pin->i_size);
@@ -696,7 +696,7 @@ PUBLIC int kread(const char* pathname, void* buf, int pos, int len)
 			bytes_rw += bytes;
 			bytes_left -= bytes;
 		}
-		printl("Read success \n");
+		//printl("Read success \n");
 		return bytes_rw;
 
 }

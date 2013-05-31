@@ -31,6 +31,7 @@ PUBLIC void init_mm()
 
 
 
+
 PUBLIC int alloc_mem(int pid, int memsize)
 {
 	//assert(pid >= (NR_TASKS + NATIVE_PROCS));
@@ -48,4 +49,9 @@ PUBLIC int alloc_mem(int pid, int memsize)
 		printl("memory allocation failed. pid:%d", pid);
 
 	return base;
+}
+
+PUBLIC void free_mem(int pid)
+{
+	return;
 }

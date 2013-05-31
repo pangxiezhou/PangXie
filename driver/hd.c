@@ -60,7 +60,7 @@ PRIVATE void hd_open(int device)
 	if(hd_info[drive].open_cnt++==0){
 		//printl("first open get partition table \n");
 		partition(drive * (NR_PART_PER_DRIVE + 1), P_PRIMARY);
-		print_hdinfo(&hd_info[drive]);
+		//print_hdinfo(&hd_info[drive]);
 	}
 	//disk rdwt test
 		/*printl("disk rw test \n");
@@ -93,7 +93,7 @@ PRIVATE void hd_identify(int drive)
 	DataReady = 0;
 	port_read(REG_DATA, hdbuf, SECTOR_SIZE);
 
-	print_identify_info((u16*)hdbuf);
+	//print_identify_info((u16*)hdbuf);
 
 	u16* hdinfo = (u16*)hdbuf;
 

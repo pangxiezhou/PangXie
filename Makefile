@@ -30,7 +30,7 @@ OBJS		= kernel/init/kernel.o kernel/syscall/syscall.o kernel/init/start.o kernel
 			kernel/tty/printf.o kernel/tty/vsprintf.o\
 			lib/kliba.o lib/klib.o lib/string.o driver/hd.o fs/fs.o fs/misc.o\
 			lib/misc.o\
-			mm/mm.o mm/fork.o mm/exec.o
+			mm/mm.o mm/fork.o mm/exec.o mm/wait.o
 DASMOUTPUT	= kernel.bin.asm
 
 # All Phony Targets

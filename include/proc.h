@@ -44,6 +44,7 @@ typedef struct proc {
 	struct file_desc * filp[NR_FILES];
 	int p_parent;
 	int  p_flags;
+	int exit_status;
 }PROCESS;
 
 typedef struct s_task {
@@ -65,6 +66,8 @@ typedef struct s_task {
 #define INDEX_LDT_C 0
 #define INDEX_LDT_RW	1
 //pflags
+#define WAITING   0x08	/* set when proc waiting for the child to terminate */
+#define HANGING   0x10	/* set when proc exits without being waited by parent */
 #define FREE_SLOT 0x20	/* set when proc table entry is not used
 /* stacks of tasks */
 #define STACK_SIZE_TTY		0x8000

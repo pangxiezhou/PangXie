@@ -145,41 +145,48 @@ void TestA()
 	int ret;
 	int fd = open("/Test2",O_CREAT|O_RDWR);
 	printf("process open file success %d \n",fd);
-	//u8 wbuf[5]={1,2,3,4,5};
+	u8 wbuf[5]={1,2,3,4,5};
 	u8 rbuf[5];
-	//ret = writef(fd, (void*)wbuf,5);
-	//printf("Process write file Success %d\n", ret);
+	ret = writef(fd, (void*)wbuf,5);
+	printf("Process write file Success %d\n", ret);
+	for(i=0;i<5;i++)
+			printf("%d",wbuf[i]);
+		printf("\n");
 	ret = close(fd);
-	fd = open("/echo",O_RDWR);
+	fd = open("/Test2",O_RDWR);
 	ret = read(fd, rbuf, 5);
 	printf("Process read file succcess %d\n",ret);
 	for(i=0;i<5;i++)
 		printf("%d",rbuf[i]);
 	printf("\n");
 	ret = close(fd);
-	printf("Process close file success %d \n", ret);*/
+	printf("Process close file success %d \n", ret);
 
-	/*ret = delete("/Test2");
+	ret = deletef("/Test2");
 	printf("Process delete file suceess %d \n",ret);*/
 	while (1) {
-		//printf("<Ticks:%x>", get_ticks());
-		//milli_delay(200);
+		//printf("A");
+		milli_delay(200);
 	}
 }
 void Init()
 {
-	//printf("Init Process \n");
-	//int pid =0;
+	printf("Init Process \n");
+
 	//printf("hehehe %d \n", 1);
 	int pid = fork();
+
 	//goin(pid);
 	if(pid){
 		printf("This parent \n");
-
+		int exitStatus = bearwait();
+		printf("wait Child exit status %d \n",exitStatus);
 	}else
 	{
+		char* argv[2]={"Hello","World"};
 		printf("This Child  \n");
-		bearexec("/echo");
+		//bearexec("/echo",argv);
+		bearexit(1);
 	}
 	//printf("Test before \n");
 	//printf("Process pid   \n");
@@ -202,7 +209,7 @@ void TestB()
 	int i = 0x1000;
 	while(1){
 		//printf("B");
-		//milli_delay(200);
+		milli_delay(200);
 	}
 }
 
@@ -214,6 +221,6 @@ void TestC()
 	int i = 0x2000;
 	while(1){
 		//printf("C");
-		//milli_delay(200);
+		milli_delay(200);
 	}
 }

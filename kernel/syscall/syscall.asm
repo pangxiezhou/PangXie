@@ -18,6 +18,8 @@ _NR_delete	equ 6
 _NR_fork		equ 7
 _NR_goin		equ 8
 _NR_exec		equ 9
+_NR_wait		equ 10
+_NR_exit		equ 11
 ; 导出符号
 global	get_ticks
 global	write
@@ -29,16 +31,32 @@ global	deletef
 global	fork
 global	goin
 global	bearexec
+global	bearwait
+global	bearexit
 
 
 ;debug
-extern debug
+;extern debug
 bits 32
 [section .text]
 ;int fork();
 
+
+
 bearexec:
 	mov eax, _NR_exec
+	mov ebx, [esp +4]
+	mov ecx, [esp + 8]
+	int		INT_VECTOR_SYS_CALL
+	ret
+
+bearwait:
+	mov  eax, _NR_wait
+	int		INT_VECTOR_SYS_CALL
+	ret
+
+bearexit:
+	mov eax, _NR_exit
 	mov ebx, [esp +4]
 	int		INT_VECTOR_SYS_CALL
 	ret
@@ -46,6 +64,7 @@ bearexec:
 goin:
 	mov eax, _NR_goin
 	 mov ebx, [esp +4]
+
 	int		INT_VECTOR_SYS_CALL
 	ret
 
